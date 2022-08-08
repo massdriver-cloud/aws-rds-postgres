@@ -30,45 +30,37 @@ resource "random_id" "snapshot_identifier" {
 }
 
 resource "aws_db_instance" "main" {
-  identifier                  = var.md_metadata.name_prefix
-  engine                      = "postgres"
-  allow_major_version_upgrade = false
-  auto_minor_version_upgrade  = true
-
-  engine_version = var.database.engine_version
-  username       = var.database.username
-  password       = random_password.root_password.result
-  instance_class = var.database.instance_class
-
-  publicly_accessible = false
-  port                = local.postgresql.port
-
-  allocated_storage     = var.storage.allocated
-  max_allocated_storage = var.storage.max_allocated
-  storage_type          = var.storage.type
-
-  iops              = var.storage.type == "io1" ? lookup(var.storage, "iops", null) : null
-  storage_encrypted = true
-  kms_key_id        = aws_kms_key.postgresql_encryption.arn
-
-  enabled_cloudwatch_logs_exports = lookup(var.observability, "enabled_cloudwatch_logs_exports", [])
-  monitoring_interval             = var.observability.enhanced_monitoring_interval
-  monitoring_role_arn             = local.enable_enhanced_monitoring ? aws_iam_role.rds_enhanced_monitoring[0].arn : null
-
+  allocated_storage                     = var.storage.allocated
+  allow_major_version_upgrade           = false
+  auto_minor_version_upgrade            = true
+  backup_retention_period               = var.backup.retention_period
+  copy_tags_to_snapshot                 = true
+  db_subnet_group_name                  = aws_db_subnet_group.main.name
+  delete_automated_backups              = var.backup.delete_automated_backups
+  deletion_protection                   = var.database.deletion_protection
+  enabled_cloudwatch_logs_exports       = lookup(var.observability, "enabled_cloudwatch_logs_exports", [])
+  engine                                = "postgres"
+  engine_version                        = var.database.engine_version
+  final_snapshot_identifier             = var.backup.skip_final_snapshot ? null : "${var.md_metadata.name_prefix}-${element(concat(random_id.snapshot_identifier.*.hex, [""]), 0)}"
+  identifier                            = var.md_metadata.name_prefix
+  instance_class                        = var.database.instance_class
+  iops                                  = var.storage.type == "io1" ? lookup(var.storage, "iops", null) : null
+  kms_key_id                            = aws_kms_key.postgresql_encryption.arn
+  max_allocated_storage                 = var.storage.max_allocated
+  monitoring_interval                   = var.observability.enhanced_monitoring_interval
+  monitoring_role_arn                   = local.enable_enhanced_monitoring ? aws_iam_role.rds_enhanced_monitoring[0].arn : null
+  parameter_group_name                  = aws_db_parameter_group.main.name
+  password                              = random_password.root_password.result
   performance_insights_enabled          = local.enable_performance_insights
-  performance_insights_retention_period = local.enable_performance_insights ? lookup(var.observability, "performance_insights_retention_period", 7) : null
   performance_insights_kms_key_id       = local.enable_performance_insights ? aws_kms_key.postgresql_encryption.arn : null
-
-  vpc_security_group_ids    = [aws_security_group.main.id]
-  db_subnet_group_name      = aws_db_subnet_group.main.name
-  parameter_group_name      = aws_db_parameter_group.main.name
-  copy_tags_to_snapshot     = true
-  deletion_protection       = var.database.deletion_protection
-  skip_final_snapshot       = var.backup.skip_final_snapshot
-  final_snapshot_identifier = var.backup.skip_final_snapshot ? null : "${var.md_metadata.name_prefix}-${element(concat(random_id.snapshot_identifier.*.hex, [""]), 0)}"
-  backup_retention_period   = var.backup.retention_period
-  delete_automated_backups  = var.backup.delete_automated_backups
-
+  performance_insights_retention_period = local.enable_performance_insights ? lookup(var.observability, "performance_insights_retention_period", 7) : null
+  port                                  = local.postgresql.port
+  publicly_accessible                   = false
+  skip_final_snapshot                   = var.backup.skip_final_snapshot
+  storage_encrypted                     = true
+  storage_type                          = var.storage.type
+  username                              = var.database.username
+  vpc_security_group_ids                = [aws_security_group.main.id]
 
   # iam_database_authentication_enabled = var.iam_database_authentication_enabled
   # apply_immediately                   = var.apply_immediately
