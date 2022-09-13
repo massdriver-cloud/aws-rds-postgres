@@ -87,6 +87,7 @@ resource "aws_db_subnet_group" "main" {
 resource "aws_kms_key" "postgresql_encryption" {
   description             = "PostgreSQL Encryption Key for ${var.md_metadata.name_prefix}"
   deletion_window_in_days = 30
+  enable_key_rotation = true
 }
 
 resource "aws_kms_alias" "postgresql_encryption" {
