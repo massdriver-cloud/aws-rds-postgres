@@ -203,9 +203,10 @@ Form input parameters for configuring a bundle for deployment.
   - **`allocated`** *(integer)*: The allocated storage in GiB. Minimum: `100`. Maximum: `65536`. Default: `100`.
   - **`iops`** *(integer)*: The amount of provisioned IOPS. Only applies if `type` is `io1`. Minimum: `1000`.
   - **`max_allocated`** *(integer)*: The max allocated storage in GiB that RDS will autoscale to. Not supported on all instance types. Set to greater than `allocated_storage` to enable. Minimum: `0`. Maximum: `65536`. Default: `0`.
-  - **`type`** *(string)*: One of 'standard' (magnetic), 'gp2' (general purpose SSD), or 'io1' (provisioned IOPS SSD). The default is 'io1' if iops is specified, 'gp2' if not. Default: `gp2`.
+  - **`type`** *(string)*: One of 'standard' (magnetic), 'gp2' (general purpose SSD), or 'io1' (provisioned IOPS SSD). The default is 'io1' if iops is specified, 'gp2' if not. Default: `gp3`.
     - **One of**
-      - SSD
+      - SSD - GP2
+      - SSD - GP3
       - Provisioned IOPS
       - Magnetic
 ## Examples
@@ -235,7 +236,7 @@ Form input parameters for configuring a bundle for deployment.
       "storage": {
           "allocated": 100,
           "max_allocated": 0,
-          "type": "gp2"
+          "type": "gp3"
       }
   }
   ```
@@ -311,11 +312,6 @@ Connections from other bundles that this bundle depends on.
         "us-west-2"
         ```
 
-      - **`resource`** *(string)*
-      - **`service`** *(string)*
-      - **`zone`** *(string)*: AWS Availability Zone.
-
-        Examples:
 - **`network`** *(object)*: . Cannot contain additional properties.
   - **`data`** *(object)*
     - **`infrastructure`** *(object)*
@@ -437,11 +433,6 @@ Connections from other bundles that this bundle depends on.
         "us-west-2"
         ```
 
-      - **`resource`** *(string)*
-      - **`service`** *(string)*
-      - **`zone`** *(string)*: AWS Availability Zone.
-
-        Examples:
 <!-- CONNECTIONS:END -->
 
 </details>
@@ -516,6 +507,18 @@ Resources created by this bundle that can be connected to other bundles.
                 "arn:aws:ec2::ACCOUNT_NUMBER:vpc/vpc-foo"
                 ```
 
+          - **`identity`** *(object)*: For instances where IAM policies must be attached to a role attached to an AWS resource, for instance AWS Eventbridge to Firehose, this attribute should be used to allow the downstream to attach it's policies (Firehose) directly to the IAM role created by the upstream (Eventbridge). It is important to remember that connections in massdriver are one way, this scheme perserves the dependency relationship while allowing bundles to control the lifecycles of resources under it's management. Cannot contain additional properties.
+            - **`role_arn`** *(string)*: ARN for this resources IAM Role.
+
+              Examples:
+              ```json
+              "arn:aws:rds::ACCOUNT_NUMBER:db/prod"
+              ```
+
+              ```json
+              "arn:aws:ec2::ACCOUNT_NUMBER:vpc/vpc-foo"
+              ```
+
           - **`network`** *(object)*: AWS security group rules to inform downstream services of ports to open for communication. Cannot contain additional properties.
             - **`^[a-z-]+$`** *(object)*
               - **`arn`** *(string)*: Amazon Resource Name.
@@ -533,7 +536,7 @@ Resources created by this bundle that can be connected to other bundles.
               - **`protocol`** *(string)*: Must be one of: `['tcp', 'udp']`.
         - Security*object*: Azure Security Configuration. Cannot contain additional properties.
           - **`iam`** *(object)*: IAM Roles And Scopes. Cannot contain additional properties.
-            - **`^[a-z/-]+$`** *(object)*
+            - **`^[a-z]+[a-z_]*[a-z]$`** *(object)*
               - **`role`**: Azure Role.
 
                 Examples:

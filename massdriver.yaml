@@ -2,8 +2,8 @@ schema: draft-07
 name: "aws-rds-postgres"
 description: "AWS RDS for PostgreSQL. PostgreSQL has become the preferred open source relational database for many enterprise developers and start-ups, powering leading business and mobile applications. Amazon RDS makes it easy to set up, operate, and scale PostgreSQL deployments in the cloud. With Amazon RDS, you can deploy scalable PostgreSQL deployments in minutes with cost-efficient and resizable hardware capacity."
 source_url: github.com/massdriver-cloud/aws-rds-postgres
-access: "public"
-type: "bundle"
+access: private
+type: infrastructure
 
 params:
   examples:
@@ -18,7 +18,7 @@ params:
       storage:
         allocated: 100
         max_allocated: 0
-        type: gp2
+        type: gp3
       backup:
         retention_period: 1
         delete_automated_backups: true
@@ -402,10 +402,12 @@ params:
           title: Storage Type
           description: One of 'standard' (magnetic), 'gp2' (general purpose SSD), or 'io1' (provisioned IOPS SSD). The default is 'io1' if iops is specified, 'gp2' if not.
           type: string
-          default: gp2
+          default: gp3
           oneOf:
-            - title: SSD
+            - title: SSD - GP2
               const: gp2
+            - title: SSD - GP3
+              const: gp3
             - title: Provisioned IOPS
               const: io1
             - title: Magnetic
