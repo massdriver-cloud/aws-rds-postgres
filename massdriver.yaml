@@ -2,8 +2,8 @@ schema: draft-07
 name: "aws-rds-postgres"
 description: "AWS RDS for PostgreSQL. PostgreSQL has become the preferred open source relational database for many enterprise developers and start-ups, powering leading business and mobile applications. Amazon RDS makes it easy to set up, operate, and scale PostgreSQL deployments in the cloud. With Amazon RDS, you can deploy scalable PostgreSQL deployments in minutes with cost-efficient and resizable hardware capacity."
 source_url: github.com/massdriver-cloud/aws-rds-postgres
-access: "public"
-type: "bundle"
+access: public
+type: infrastructure
 
 params:
   examples:
