@@ -404,7 +404,9 @@ params:
           type: string
           default: gp2
           oneOf:
-            - title: SSD
+            - title: GP3 - SSD
+              const: gp3          
+            - title: GP2 - SSD
               const: gp2
             - title: Provisioned IOPS
               const: io1
