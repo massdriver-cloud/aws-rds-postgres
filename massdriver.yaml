@@ -412,12 +412,30 @@ params:
               const: io1
             - title: Magnetic
               const: standard
-        iops:
-          title: IOPS
-          description: The amount of provisioned IOPS. Only applies if `type` is `io1`.
-          type: integer
-          minimum: 1000
-          max: 256000
+      dependencies:
+        type:
+          oneOf:
+            - properties:
+                type:
+                  const: io1
+                iops:
+                  title: IOPS
+                  description: The amount of provisioned IOPS. Only applies if `type` is `io1`.
+                  type: integer
+                  minimum: 1000
+                  max: 256000
+              required:
+                - iops
+            - properties:
+                type:
+                  const: gp3
+            - properties:
+                type:
+                  const: gp2
+            - properties:
+                type:
+                  const: standard
+                
 
     observability:
       title: Observability
