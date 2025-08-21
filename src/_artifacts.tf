@@ -26,9 +26,8 @@ locals {
 }
 
 resource "massdriver_artifact" "authentication" {
-  field                = "authentication"
-  provider_resource_id = aws_db_instance.main.arn
-  name                 = "PostgreSQL Root Credentials: ${aws_db_instance.main.identifier}"
+  field    = "authentication"
+  name     = "PostgreSQL Root Credentials: ${aws_db_instance.main.identifier}"
   artifact = jsonencode(
     {
       data = {
